@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bangkok Buddy — Your Local Companion in Bangkok</title>
+  <style>
+    /* ─────────────────────────────────────────────
+       TOKENS & RESET
+    ───────────────────────────────────────────── */
+    :root {
+      --bg:        #FAFAF9;
+      --surface:   #FFFFFF;
+      --border:    #E8E8E4;
+      --text:      #1A1A1A;
+      --muted:     #6B6B6B;
+      --gold:      #C69B5A;
+      --gold-lt:   #F5ECD8;
+      --gold-dk:   #A07A3B;
+      --accent:    #1A1A1A;
+      --radius:    12px;
+      --shadow:    0 2px 16px rgba(0,0,0,.07);
+      --shadow-lg: 0 8px 40px rgba(0,0,0,.12);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    img { display: block; max-width: 100%; }
+    button { cursor: pointer; font-family: inherit; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ─────────────────────────────────────────────
+       LAYOUT HELPERS
+    ───────────────────────────────────────────── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .section    { padding: 96px 0; }
+    .section--sm { padding: 64px 0; }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .heading {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -.02em;
+      color: var(--text);
+    }
+    .sub {
+      font-size: 17px;
+      color: var(--muted);
+      margin-top: 14px;
+      max-width: 540px;
+    }
+    .gold-line {
+      width: 40px; height: 3px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin-top: 20px;
+    }
+
+    /* ─────────────────────────────────────────────
+       NAVIGATION
+    ───────────────────────────────────────────── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(250,250,249,.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav__inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 68px;
+    }
+    .nav__logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 18px; letter-spacing: -.02em;
+    }
+    .nav__logo-mark {
+      width: 34px; height: 34px;
+      background: var(--gold);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: #fff; font-weight: 800;
+    }
+    .nav__links {
+      display: flex; align-items: center; gap: 32px;
+      list-style: none;
+    }
+    .nav__links a { font-size: 14px; color: var(--muted); font-weight: 500; transition: color .2s; }
+    .nav__links a:hover { color: var(--text); }
+    .nav__cta {
+      background: var(--text);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      transition: background .2s, transform .15s;
+    }
+    .nav__cta:hover { background: #333; transform: translateY(-1px); }
+
+    /* ─────────────────────────────────────────────
+       HERO
+    ───────────────────────────────────────────── */
+    .hero {
+      padding: 160px 0 96px;
+      background: linear-gradient(160deg, #FEFCF7 0%, #F5F0E8 100%);
+      overflow: hidden;
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -120px; right: -80px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(198,155,90,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero__grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+    }
+    .hero__badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--gold-lt);
+      border: 1px solid rgba(198,155,90,.3);
+      color: var(--gold-dk);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px; font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .hero__badge-dot {
+      width: 7px; height: 7px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .5; transform: scale(1.4); }
+    }
+    .hero__heading {
+      font-size: clamp(36px, 5vw, 58px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -.03em;
+    }
+    .hero__heading span { color: var(--gold); }
+    .hero__sub {
+      font-size: 18px;
+      color: var(--muted);
+      margin-top: 20px;
+      max-width: 460px;
+    }
+    .hero__actions {
+      display: flex; gap: 14px; margin-top: 36px;
+      flex-wrap: wrap; align-items: center;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 15px; font-weight: 600;
+      border: none;
+      transition: all .2s;
+    }
+    .btn--primary {
+      background: var(--text); color: #fff;
+    }
+    .btn--primary:hover { background: #333; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+    .btn--outline {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text);
+    }
+    .btn--outline:hover { border-color: var(--text); transform: translateY(-2px); }
+    .btn--gold {
+      background: var(--gold); color: #fff;
+    }
+    .btn--gold:hover { background: var(--gold-dk); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(198,155,90,.35); }
+
+    .hero__stats {
+      display: flex; gap: 32px; margin-top: 48px;
+    }
+    .hero__stat-num {
+      font-size: 26px; font-weight: 800; letter-spacing: -.02em;
+    }
+    .hero__stat-lbl {
+      font-size: 13px; color: var(--muted); margin-top: 2px;
+    }
+    .hero__divider { width: 1px; background: var(--border); }
+
+    /* Visual card */
+    .hero__visual {
+      position: relative;
+    }
+    .hero__card {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+    }
+    .hero__card-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+    }
+    .avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-lt), var(--gold));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .hero__card-name { font-weight: 700; font-size: 15px; }
+    .hero__card-role { font-size: 12px; color: var(--muted); }
+    .hero__card-status {
+      margin-left: auto;
+      background: #ECFDF5; color: #059669;
+      font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 999px;
+    }
+    .hero__card-tags {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;
+    }
+    .chip {
+      font-size: 12px; font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .chip--gold { border-color: rgba(198,155,90,.4); color: var(--gold-dk); background: var(--gold-lt); }
+    .hero__card-book {
+      background: var(--gold);
+      color: #fff;
+      border: none;
+      width: 100%; padding: 12px;
+      border-radius: 10px;
+      font-size: 14px; font-weight: 600;
+    }
+    .hero__float {
+      position: absolute;
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .hero__float--1 { top: -18px; right: -18px; }
+    .hero__float--2 { bottom: -14px; left: -18px; }
+    .hero__float-icon { font-size: 18px; margin-bottom: 2px; }
+    .hero__float-val { font-weight: 700; font-size: 16px; }
+    .hero__float-lbl { color: var(--muted); font-size: 11px; }
+
+    /* ─────────────────────────────────────────────
+       TRUST BAR
+    ───────────────────────────────────────────── */
+    .trust {
+      padding: 24px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .trust__inner {
+      display: flex; align-items: center; justify-content: center;
+      gap: 48px; flex-wrap: wrap;
+    }
+    .trust__item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; font-weight: 500; color: var(--muted);
+    }
+    .trust__icon { font-size: 18px; }
+
+    /* ─────────────────────────────────────────────
+       SERVICES
+    ───────────────────────────────────────────── */
+    .services__head { text-align: center; margin-bottom: 56px; }
+    .services__head .sub { margin: 14px auto 0; }
+    .services__head .gold-line { margin: 20px auto 0; }
+    .services__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .service-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      transition: all .25s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 3px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .3s;
+    }
+    .service-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    .service-card:hover::before { transform: scaleX(1); }
+    .service-card__icon {
+      font-size: 32px; margin-bottom: 16px;
+      width: 58px; height: 58px;
+      background: var(--gold-lt);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .service-card__title {
+      font-size: 16px; font-weight: 700; margin-bottom: 8px;
+    }
+    .service-card__desc {
+      font-size: 14px; color: var(--muted); line-height: 1.55;
+      margin-bottom: 16px;
+    }
+    .service-card__durations {
+      display: flex; gap: 8px;
+    }
+    .dur-tag {
+      font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 6px;
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    /* ─────────────────────────────────────────────
+       HOW IT WORKS
+    ───────────────────────────────────────────── */
+    .hiw { background: var(--surface); }
+    .hiw__head { text-align: center; margin-bottom: 60px; }
+    .hiw__head .gold-line { margin: 20px auto 0; }
+    .hiw__steps {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      position: relative;
+    }
+    .hiw__steps::before {
+      content: '';
+      position: absolute; top: 32px; left: 10%; right: 10%;
+      height: 2px;
+      background: repeating-linear-gradient(90deg, var(--gold) 0, var(--gold) 8px, transparent 8px, transparent 18px);
+      z-index: 0;
+    }
+    .hiw__step {
+      text-align: center; padding: 0 16px;
+      position: relative; z-index: 1;
+    }
+    .hiw__step-num {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 2px solid var(--gold);
+      color: var(--gold);
+      font-size: 22px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .hiw__step-title {
+      font-size: 15px; font-weight: 700; margin-bottom: 8px;
+    }
+    .hiw__step-text {
+      font-size: 13px; color: var(--muted); line-height: 1.6;
+    }
+
+    /* ─────────────────────────────────────────────
+       BOOKING SECTION
+    ───────────────────────────────────────────── */
+    #book { background: var(--bg); }
+    .booking__wrap {
+      max-width: 820px; margin: 0 auto;
+    }
+    .booking__head { text-align: center; margin-bottom: 48px; }
+    .booking__head .gold-line { margin: 20px auto 0; }
+
+    /* Stepper */
+    .stepper {
+      display: flex; align-items: center;
+      margin-bottom: 48px;
+      gap: 0;
+    }
+    .step-item {
+      display: flex; align-items: center; flex: 1;
+    }
+    .step-item:last-child { flex: none; }
+    .step-circle {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+      flex-shrink: 0;
+      border: 2px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      transition: all .3s;
+    }
+    .step-circle.active {
+      background: var(--gold); color: #fff; border-color: var(--gold);
+    }
+    .step-circle.done {
+      background: var(--text); color: #fff; border-color: var(--text);
+    }
+    .step-label {
+      font-size: 12px; font-weight: 600; color: var(--muted);
+      margin-left: 10px; white-space: nowrap;
+      transition: color .3s;
+    }
+    .step-label.active { color: var(--gold); }
+    .step-label.done  { color: var(--text); }
+    .step-connector {
+      flex: 1; height: 2px;
+      background: var(--border);
+      margin: 0 12px;
+      transition: background .3s;
+    }
+    .step-connector.done { background: var(--text); }
+
+    /* Form panels */
+    .panel {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      display: none;
+    }
+    .panel.active { display: block; }
+    .panel__title {
+      font-size: 20px; font-weight: 700; margin-bottom: 6px;
+    }
+    .panel__sub {
+      font-size: 14px; color: var(--muted); margin-bottom: 32px;
+    }
+
+    /* Step 1 — Service & Duration */
+    .service-options {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; margin-bottom: 32px;
+    }
+    .opt-card {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .opt-card:hover { border-color: var(--gold); }
+    .opt-card.selected {
+      border-color: var(--gold);
+      background: var(--gold-lt);
+    }
+    .opt-card__icon { font-size: 22px; flex-shrink: 0; }
+    .opt-card__name { font-size: 14px; font-weight: 600; }
+    .opt-card__hint { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .opt-radio { margin-left: auto; flex-shrink: 0; }
+    .opt-radio input { accent-color: var(--gold); width: 16px; height: 16px; }
+
+    .dur-section { margin-bottom: 32px; }
+    .dur-section label { font-size: 14px; font-weight: 600; display: block; margin-bottom: 12px; }
+    .dur-options { display: flex; gap: 12px; }
+    .dur-option {
+      flex: 1;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .dur-option:hover { border-color: var(--gold); }
+    .dur-option.selected { border-color: var(--gold); background: var(--gold-lt); }
+    .dur-option__hrs { font-size: 22px; font-weight: 800; color: var(--gold); }
+    .dur-option__lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .dur-option__sub { font-size: 11px; color: var(--muted); }
+
+    /* Step 2 — Calendar & Time */
+    .cal-section { margin-bottom: 28px; }
+    .cal-section label { font-size: 14px; font-weight: 600; display: block; margin-bottom: 12px; }
+    .calendar {
+      border: 1.5px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .cal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .cal-nav { background: none; border: 1.5px solid var(--border); width: 32px; height: 32px; border-radius: 8px; font-size: 14px; color: var(--muted); cursor: pointer; transition: all .15s; }
+    .cal-nav:hover { border-color: var(--text); color: var(--text); }
+    .cal-month { font-size: 15px; font-weight: 700; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; }
+    .cal-day-name {
+      text-align: center; font-size: 11px; font-weight: 600;
+      color: var(--muted); padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      letter-spacing: .06em;
+    }
+    .cal-day {
+      text-align: center; padding: 10px 0;
+      font-size: 13px; cursor: pointer;
+      border-radius: 0;
+      transition: all .15s;
+      color: var(--text);
+    }
+    .cal-day:hover:not(.empty):not(.past) { background: var(--gold-lt); color: var(--gold-dk); }
+    .cal-day.today { font-weight: 700; color: var(--gold); }
+    .cal-day.selected { background: var(--gold); color: #fff; font-weight: 700; }
+    .cal-day.empty, .cal-day.past { color: #ccc; cursor: default; }
+
+    .time-section label { font-size: 14px; font-weight: 600; display: block; margin-bottom: 12px; }
+    .time-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .time-slot {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 6px;
+      text-align: center;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all .15s;
+    }
+    .time-slot:hover { border-color: var(--gold); color: var(--gold-dk); }
+    .time-slot.selected { background: var(--gold); color: #fff; border-color: var(--gold); }
+    .time-endtime {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: var(--bg);
+      border-radius: 8px;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      display: none;
+    }
+    .time-endtime.visible { display: block; }
+    .time-endtime span { font-weight: 700; color: var(--gold); }
+
+    /* Step 3 — Details */
+    .form-group { margin-bottom: 22px; }
+    .form-group label {
+      font-size: 13px; font-weight: 600;
+      display: block; margin-bottom: 8px; color: var(--text);
+    }
+    .form-hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px; font-family: inherit;
+      background: var(--surface);
+      color: var(--text);
+      transition: border-color .2s;
+      outline: none;
+    }
+    .form-control:focus { border-color: var(--gold); }
+    textarea.form-control { resize: vertical; min-height: 100px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* Step 4 — Review */
+    .review-box {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 28px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 28px;
+    }
+    .review-box__title {
+      font-size: 13px; font-weight: 600; color: var(--muted);
+      letter-spacing: .08em; text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .review-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .review-row:last-child { border-bottom: none; }
+    .review-row__key { color: var(--muted); }
+    .review-row__val { font-weight: 600; text-align: right; max-width: 55%; }
+    .review-note {
+      background: var(--gold-lt);
+      border: 1px solid rgba(198,155,90,.3);
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 13px;
+      color: var(--gold-dk);
+      margin-bottom: 28px;
+      display: flex; gap: 10px;
+    }
+
+    /* Navigation buttons */
+    .panel-actions {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 36px; gap: 12px;
+    }
+    .btn-back {
+      background: none; border: 1.5px solid var(--border);
+      color: var(--muted); padding: 12px 24px; border-radius: 10px;
+      font-size: 14px; font-weight: 600;
+      transition: all .2s;
+    }
+    .btn-back:hover { border-color: var(--text); color: var(--text); }
+    .btn-next {
+      background: var(--text); color: #fff;
+      border: none; padding: 12px 28px; border-radius: 10px;
+      font-size: 14px; font-weight: 600;
+      margin-left: auto;
+      transition: all .2s;
+    }
+    .btn-next:hover { background: #333; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,.18); }
+    .btn-submit {
+      background: var(--gold); color: #fff;
+      border: none; padding: 14px 32px; border-radius: 10px;
+      font-size: 15px; font-weight: 700;
+      margin-left: auto;
+      transition: all .2s;
+    }
+    .btn-submit:hover { background: var(--gold-dk); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(198,155,90,.35); }
+
+    /* ─────────────────────────────────────────────
+       THANK YOU
+    ───────────────────────────────────────────── */
+    #thankyou { display: none; }
+    #thankyou.visible { display: block; }
+    .ty-wrap {
+      max-width: 620px; margin: 0 auto;
+      text-align: center; padding: 80px 0;
+    }
+    .ty-icon {
+      width: 88px; height: 88px;
+      background: var(--gold-lt);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 42px;
+      margin: 0 auto 32px;
+      border: 2px solid rgba(198,155,90,.3);
+    }
+    .ty-heading { font-size: 32px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 16px; }
+    .ty-sub { font-size: 16px; color: var(--muted); margin-bottom: 36px; }
+    .ty-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 28px; margin-bottom: 32px;
+      text-align: left;
+    }
+    .ty-card__title {
+      font-size: 12px; font-weight: 600; color: var(--muted);
+      letter-spacing: .1em; text-transform: uppercase; margin-bottom: 16px;
+    }
+    .ty-steps { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .ty-steps li { display: flex; gap: 12px; font-size: 14px; align-items: flex-start; }
+    .ty-steps li::before {
+      content: attr(data-n);
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--gold-lt); color: var(--gold-dk);
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .ty-ref {
+      display: inline-block;
+      background: var(--bg); border: 1.5px solid var(--border);
+      padding: 10px 24px; border-radius: 8px;
+      font-size: 15px; font-weight: 700; letter-spacing: .08em;
+      color: var(--muted); margin-bottom: 32px;
+    }
+
+    /* ─────────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────────── */
+    .footer {
+      background: var(--text); color: rgba(255,255,255,.7);
+      padding: 56px 0 32px;
+    }
+    .footer__grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px; margin-bottom: 48px;
+    }
+    .footer__logo {
+      font-size: 18px; font-weight: 700; color: #fff;
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 14px;
+    }
+    .footer__logo-mark {
+      width: 32px; height: 32px; background: var(--gold);
+      border-radius: 7px; display: flex; align-items: center; justify-content: center;
+      font-size: 15px; color: #fff; font-weight: 800;
+    }
+    .footer__desc { font-size: 14px; line-height: 1.7; margin-bottom: 20px; }
+    .footer__social { display: flex; gap: 12px; }
+    .footer__social-btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; transition: all .2s;
+      background: none;
+      color: rgba(255,255,255,.6);
+    }
+    .footer__social-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .footer__col-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+    .footer__links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer__links a { font-size: 13px; transition: color .2s; }
+    .footer__links a:hover { color: var(--gold); }
+    .footer__bottom {
+      border-top: 1px solid rgba(255,255,255,.1);
+      padding-top: 24px;
+      display: flex; justify-content: space-between;
+      font-size: 12px; flex-wrap: wrap; gap: 8px;
+    }
+
+    /* ─────────────────────────────────────────────
+       RESPONSIVE
+    ───────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero__grid { grid-template-columns: 1fr; }
+      .hero__visual { display: none; }
+      .hiw__steps { grid-template-columns: 1fr 1fr; }
+      .hiw__steps::before { display: none; }
+      .footer__grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .nav__links { display: none; }
+      .service-options { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .time-grid { grid-template-columns: repeat(3, 1fr); }
+      .panel { padding: 24px; }
+      .dur-options { flex-wrap: wrap; }
+      .stepper { overflow-x: auto; }
+    }
+
+    /* ─────────────────────────────────────────────
+       INLINE VALIDATION
+    ───────────────────────────────────────────── */
+    .field-error {
+      color: #dc2626;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+    }
+    .field-error.visible { display: flex; }
+    .form-control.error  { border-color: #dc2626 !important; background: #fff8f8; }
+    .form-control.ok     { border-color: #059669 !important; }
+
+    .email-status {
+      display: none;
+      font-size: 12px;
+      margin-top: 5px;
+      align-items: center;
+      gap: 6px;
+    }
+    .email-status.visible  { display: flex; }
+    .email-status.checking { color: var(--muted); }
+    .email-status.valid    { color: #059669; font-weight: 500; }
+    .email-status.invalid  { color: #dc2626; font-weight: 500; }
+
+    .panel-error {
+      background: #fff5f5;
+      border: 1.5px solid #fca5a5;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #dc2626;
+      margin-bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+    .panel-error.visible { display: flex; }
+
+    .opt-card.shake, .dur-option.shake {
+      animation: shake .35s ease;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-5px); }
+      40%      { transform: translateX(5px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+    .btn-next:disabled, .btn-submit:disabled {
+      opacity: .6; cursor: not-allowed; transform: none !important;
+    }
+  </style>
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     NAV
+═══════════════════════════════════════════ -->
+<nav class="nav">
+  <div class="container nav__inner">
+    <div class="nav__logo">
+      <div class="nav__logo-mark">B</div>
+      Bangkok Buddy
+    </div>
+    <ul class="nav__links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#book">Book a Buddy</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="nav__cta" onclick="scrollToBook()">Book a Buddy →</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero__grid">
+      <div>
+        <div class="hero__badge">
+          <div class="hero__badge-dot"></div>
+          Now Serving Bangkok
+        </div>
+        <h1 class="hero__heading">
+          Your Local<br>
+          <span>Companion</span><br>
+          in Bangkok
+        </h1>
+        <p class="hero__sub">
+          Trusted local guides for navigating Bangkok's culture, streets, markets, and nightlife — tailored to you.
+        </p>
+        <div class="hero__actions">
+          <button class="btn btn--primary" onclick="scrollToBook()">Book a Buddy →</button>
+          <button class="btn btn--outline" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">Explore Services</button>
+        </div>
+        <div class="hero__stats">
+          <div>
+            <div class="hero__stat-num">500+</div>
+            <div class="hero__stat-lbl">Happy Guests</div>
+          </div>
+          <div class="hero__divider"></div>
+          <div>
+            <div class="hero__stat-num">7</div>
+            <div class="hero__stat-lbl">Service Types</div>
+          </div>
+          <div class="hero__divider"></div>
+          <div>
+            <div class="hero__stat-num">4.9★</div>
+            <div class="hero__stat-lbl">Average Rating</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero__visual">
+        <div class="hero__float hero__float--1">
+          <div class="hero__float-icon">📍</div>
+          <div class="hero__float-val">Bangkok</div>
+          <div class="hero__float-lbl">Thailand</div>
+        </div>
+        <div class="hero__card">
+          <div class="hero__card-header">
+            <div class="avatar">🙋</div>
+            <div>
+              <div class="hero__card-name">Ploy — Your Buddy</div>
+              <div class="hero__card-role">Urban Navigator · Translator</div>
+            </div>
+            <div class="hero__card-status">Available</div>
+          </div>
+          <div class="hero__card-tags">
+            <span class="chip chip--gold">Thai & English</span>
+            <span class="chip">BTS Expert</span>
+            <span class="chip">Street Food</span>
+            <span class="chip">Photography</span>
+          </div>
+          <div style="font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.6;">
+            "I'll make sure you see the real Bangkok — from hidden temples to the best pad thai in town. Let's make it unforgettable!"
+          </div>
+          <button class="hero__card-book" onclick="scrollToBook()">Request This Buddy →</button>
+        </div>
+        <div class="hero__float hero__float--2">
+          <div class="hero__float-icon">⭐</div>
+          <div class="hero__float-val">4.9 / 5.0</div>
+          <div class="hero__float-lbl">Average Rating</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     TRUST BAR
+═══════════════════════════════════════════ -->
+<div class="trust">
+  <div class="container">
+    <div class="trust__inner">
+      <div class="trust__item"><span class="trust__icon">✅</span> Verified Local Buddies</div>
+      <div class="trust__item"><span class="trust__icon">🔒</span> Safe & Vetted</div>
+      <div class="trust__item"><span class="trust__icon">📱</span> WhatsApp Confirmation</div>
+      <div class="trust__item"><span class="trust__icon">🌍</span> Multi-language Support</div>
+      <div class="trust__item"><span class="trust__icon">⚡</span> Quick Response</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SERVICES
+═══════════════════════════════════════════ -->
+<section class="section" id="services">
+  <div class="container">
+    <div class="services__head">
+      <div class="tag">What We Offer</div>
+      <h2 class="heading">Choose Your Buddy Type</h2>
+      <p class="sub">From city navigation to nightlife safety — we have a specialist for every need.</p>
+      <div class="gold-line"></div>
+    </div>
+    <div class="services__grid">
+      <div class="service-card" onclick="selectServiceAndBook('Urban Navigator')">
+        <div class="service-card__icon">🗺️</div>
+        <div class="service-card__title">Urban Navigator</div>
+        <div class="service-card__desc">Master Bangkok's BTS, MRT, and river boats. Your personal guide through temples, markets, and neighborhoods.</div>
+        <div class="service-card__durations">
+          <span class="dur-tag">2 Hrs</span><span class="dur-tag">4 Hrs</span><span class="dur-tag">8 Hrs</span>
+        </div>
+      </div>
+      <div class="service-card" onclick="selectServiceAndBook('Local Translator')">
+        <div class="service-card__icon">🗣️</div>
+        <div class="service-card__title">Local Translator</div>
+        <div class="service-card__desc">Fluent in Thai, English, and more. Ideal for meetings, medical visits, negotiations, or daily errands.</div>
+        <div class="service-card__durations">
+          <span class="dur-tag">2 Hrs</span><span class="dur-tag">4 Hrs</span><span class="dur-tag">8 Hrs</span>
+        </div>
+      </div>
+      <div class="service-card" onclick="selectServiceAndBook('Shopping Buddy')">
+        <div class="service-card__icon">🛍️</div>
+        <div class="service-card__title">Shopping Buddy</div>
+        <div class="service-card__desc">From Chatuchak Weekend Market to luxury malls — we'll find the best deals and help you bargain like a local.</div>
+        <div class="service-card__durations">
+          <span class="dur-tag">2 Hrs</span><span class="dur-tag">4 Hrs</span><span class="dur-tag">8 Hrs</span>
+        </div>
+      </div>
+      <div class="service-card" onclick="selectServiceAndBook('Content & Photo Buddy')">
+        <div class="service-card__icon">📸</div>
+        <div class="service-card__title">Content & Photo Buddy</div>
+        <div class="service-card__desc">Know all the best spots for that perfect shot. Your creative companion for content, Reels, and photography tours.</div>
+        <div class="service-card__durations">
+          <span class="dur-tag">2 Hrs</span><span class="dur-tag">4 Hrs</span><span class="dur-tag">8 Hrs</span>
+        </div>
+      </div>
+      <div class="service-card" onclick="selectServiceAndBook('Nightlife Safety Buddy')">
+        <div class="service-card__icon">🌙</div>
+        <div class="service-card__title">Nightlife Safety Buddy</div>
+        <div class="service-card__desc">Explore Bangkok's nightlife with confidence. A trusted, discreet companion who ensures you have a great and safe night out.</div>
+        <div class="service-card__durations">
+          <span class="dur-tag">2 Hrs</span><span class="dur-tag">4 Hrs</span><span class="dur-tag">8 Hrs</span>
+        </div>
+      </div>
+      <div class="service-card" onclick="selectServiceAndBook('Companion Buddy')">
+        <div class="service-card__icon">🤝</div>
+        <div class="service-card__title">Companion Buddy</div>
+        <div class="service-card__desc">Simply great company. Share a meal, explore a museum, or enjoy a leisurely day around the city with a friendly local.</div>
+        <div class="service-card__durations">
+          <span class="dur-tag">2 Hrs</span><span class="dur-tag">4 Hrs</span><span class="dur-tag">8 Hrs</span>
+        </div>
+      </div>
+      <div class="service-card" onclick="selectServiceAndBook('Freestyle Buddy')">
+        <div class="service-card__icon">🎯</div>
+        <div class="service-card__title">Freestyle Buddy</div>
+        <div class="service-card__desc">Have a unique request? Tell us what you need. Our freestyle buddies adapt to any situation — truly customized to you.</div>
+        <div class="service-card__durations">
+          <span class="dur-tag">2 Hrs</span><span class="dur-tag">4 Hrs</span><span class="dur-tag">8 Hrs</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     HOW IT WORKS
+═══════════════════════════════════════════ -->
+<section class="section hiw" id="how">
+  <div class="container">
+    <div class="hiw__head">
+      <div class="tag">Simple Process</div>
+      <h2 class="heading">How It Works</h2>
+      <p class="sub" style="margin:14px auto 0;">From request to adventure — in 4 easy steps.</p>
+      <div class="gold-line"></div>
+    </div>
+    <div class="hiw__steps">
+      <div class="hiw__step">
+        <div class="hiw__step-num">1</div>
+        <div class="hiw__step-title">Pick Your Service</div>
+        <div class="hiw__step-text">Choose the type of buddy you need and how long you'd like them for.</div>
+      </div>
+      <div class="hiw__step">
+        <div class="hiw__step-num">2</div>
+        <div class="hiw__step-title">Select Date & Time</div>
+        <div class="hiw__step-text">Pick a date and a start time. We'll calculate your end time automatically.</div>
+      </div>
+      <div class="hiw__step">
+        <div class="hiw__step-num">3</div>
+        <div class="hiw__step-title">Share Your Plans</div>
+        <div class="hiw__step-text">Tell us your meeting point, itinerary details, and contact information.</div>
+      </div>
+      <div class="hiw__step">
+        <div class="hiw__step-num">4</div>
+        <div class="hiw__step-title">We'll Be in Touch</div>
+        <div class="hiw__step-text">Our team assigns your perfect buddy and sends payment instructions via WhatsApp.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     BOOKING SECTION
+═══════════════════════════════════════════ -->
+<section class="section" id="book">
+  <div class="container booking__wrap">
+    <div class="booking__head">
+      <div class="tag">Booking Request</div>
+      <h2 class="heading">Book a Buddy</h2>
+      <p class="sub" style="margin:14px auto 0;">Fill out the form below and our team will confirm your request within 2 hours.</p>
+      <div class="gold-line"></div>
+    </div>
+
+    <!-- Stepper -->
+    <div class="stepper" id="stepper">
+      <div class="step-item">
+        <div class="step-circle active" id="sc1">1</div>
+        <div class="step-label active" id="sl1">Service</div>
+      </div>
+      <div class="step-connector" id="conn1"></div>
+      <div class="step-item">
+        <div class="step-circle" id="sc2">2</div>
+        <div class="step-label" id="sl2">Date & Time</div>
+      </div>
+      <div class="step-connector" id="conn2"></div>
+      <div class="step-item">
+        <div class="step-circle" id="sc3">3</div>
+        <div class="step-label" id="sl3">Your Details</div>
+      </div>
+      <div class="step-connector" id="conn3"></div>
+      <div class="step-item">
+        <div class="step-circle" id="sc4">4</div>
+        <div class="step-label" id="sl4">Review</div>
+      </div>
+    </div>
+
+    <!-- ── STEP 1: Service & Duration ── -->
+    <div class="panel active" id="panel1">
+      <div class="panel__title">Select Service & Duration</div>
+      <div class="panel__sub">Choose the type of companion you need and how long you'd like the session to be.</div>
+
+      <div style="font-size:14px; font-weight:600; margin-bottom:12px;">Service Category</div>
+      <div class="service-options" id="serviceOptions">
+        <div class="opt-card" onclick="selectService(this, 'Urban Navigator')">
+          <div class="opt-card__icon">🗺️</div>
+          <div>
+            <div class="opt-card__name">Urban Navigator</div>
+            <div class="opt-card__hint">City guide & transport</div>
+          </div>
+          <div class="opt-radio"><input type="radio" name="svc"></div>
+        </div>
+        <div class="opt-card" onclick="selectService(this, 'Local Translator')">
+          <div class="opt-card__icon">🗣️</div>
+          <div>
+            <div class="opt-card__name">Local Translator</div>
+            <div class="opt-card__hint">Language & communication</div>
+          </div>
+          <div class="opt-radio"><input type="radio" name="svc"></div>
+        </div>
+        <div class="opt-card" onclick="selectService(this, 'Shopping Buddy')">
+          <div class="opt-card__icon">🛍️</div>
+          <div>
+            <div class="opt-card__name">Shopping Buddy</div>
+            <div class="opt-card__hint">Markets, malls & bargaining</div>
+          </div>
+          <div class="opt-radio"><input type="radio" name="svc"></div>
+        </div>
+        <div class="opt-card" onclick="selectService(this, 'Content & Photo Buddy')">
+          <div class="opt-card__icon">📸</div>
+          <div>
+            <div class="opt-card__name">Content & Photo Buddy</div>
+            <div class="opt-card__hint">Photography & content creation</div>
+          </div>
+          <div class="opt-radio"><input type="radio" name="svc"></div>
+        </div>
+        <div class="opt-card" onclick="selectService(this, 'Nightlife Safety Buddy')">
+          <div class="opt-card__icon">🌙</div>
+          <div>
+            <div class="opt-card__name">Nightlife Safety Buddy</div>
+            <div class="opt-card__hint">Safe night-out companion</div>
+          </div>
+          <div class="opt-radio"><input type="radio" name="svc"></div>
+        </div>
+        <div class="opt-card" onclick="selectService(this, 'Companion Buddy')">
+          <div class="opt-card__icon">🤝</div>
+          <div>
+            <div class="opt-card__name">Companion Buddy</div>
+            <div class="opt-card__hint">Friendly company & social</div>
+          </div>
+          <div class="opt-radio"><input type="radio" name="svc"></div>
+        </div>
+        <div class="opt-card" onclick="selectService(this, 'Freestyle Buddy')">
+          <div class="opt-card__icon">🎯</div>
+          <div>
+            <div class="opt-card__name">Freestyle Buddy</div>
+            <div class="opt-card__hint">Flexible & custom needs</div>
+          </div>
+          <div class="opt-radio"><input type="radio" name="svc"></div>
+        </div>
+      </div>
+
+      <div class="dur-section">
+        <label>Session Duration</label>
+        <div class="dur-options">
+          <div class="dur-option" onclick="selectDuration(this, 2)">
+            <div class="dur-option__hrs">2</div>
+            <div class="dur-option__lbl">Hours</div>
+            <div class="dur-option__sub">Quick session</div>
+          </div>
+          <div class="dur-option" onclick="selectDuration(this, 4)">
+            <div class="dur-option__hrs">4</div>
+            <div class="dur-option__lbl">Hours</div>
+            <div class="dur-option__sub">Half-day</div>
+          </div>
+          <div class="dur-option" onclick="selectDuration(this, 8)">
+            <div class="dur-option__hrs">8</div>
+            <div class="dur-option__lbl">Hours</div>
+            <div class="dur-option__sub">Full-day</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-error" id="err-step1"></div>
+      <div class="panel-actions">
+        <div></div>
+        <button class="btn-next" id="btn-next1" onclick="goToStep(2)">Next: Choose Date & Time →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: Date & Time ── -->
+    <div class="panel" id="panel2">
+      <div class="panel__title">Pick a Date & Time</div>
+      <div class="panel__sub">Select your preferred date and start time. End time is calculated automatically.</div>
+
+      <div class="cal-section">
+        <label>Select Date</label>
+        <div class="calendar">
+          <div class="cal-header">
+            <button class="cal-nav" onclick="prevMonth()">‹</button>
+            <div class="cal-month" id="calMonth"></div>
+            <button class="cal-nav" onclick="nextMonth()">›</button>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+      </div>
+
+      <div class="time-section" id="timeSection" style="margin-top:24px;">
+        <label>Select Start Time</label>
+        <div class="time-grid" id="timeGrid"></div>
+        <div class="time-endtime" id="endTimeBox">
+          Session ends at: <span id="endTimeVal">—</span>
+        </div>
+      </div>
+
+      <div class="panel-error" id="err-step2"></div>
+      <div class="panel-actions">
+        <button class="btn-back" onclick="goToStep(1)">← Back</button>
+        <button class="btn-next" id="btn-next2" onclick="goToStep(3)">Next: Your Details →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: Details ── -->
+    <div class="panel" id="panel3">
+      <div class="panel__title">Your Details & Meeting Point</div>
+      <div class="panel__sub">Tell us where to meet and a bit about your plans.</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input class="form-control" type="text" id="fName" placeholder="Your full name" />
+          <div class="field-error" id="err-name"></div>
+        </div>
+        <div class="form-group">
+          <label>Email Address *</label>
+          <input class="form-control" type="email" id="fEmail" placeholder="you@email.com" />
+          <div class="field-error" id="err-email"></div>
+          <div class="email-status" id="email-status"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>WhatsApp Number *</label>
+        <input class="form-control" type="tel" id="fPhone" placeholder="+66 or international format (e.g. +1 555 000 0000)" />
+        <div class="field-error" id="err-phone"></div>
+        <div class="form-hint">We'll use this to confirm your booking and send buddy details.</div>
+      </div>
+      <div class="form-group">
+        <label>Meeting Point *</label>
+        <input class="form-control" type="text" id="fMeeting" placeholder="e.g. BTS Asok Station Exit 3, Lobby of Marriott Sukhumvit…" />
+        <div class="field-error" id="err-meeting"></div>
+        <div class="form-hint">⚠️ Must be a public space (hotel lobby, BTS station, shopping mall entrance, etc.)</div>
+      </div>
+      <div class="form-group">
+        <label>Your Plans / Specific Needs *</label>
+        <textarea class="form-control" id="fPlans" placeholder="Tell us what you'd like to do — places to visit, things to buy, languages needed, any accessibility requirements, etc."></textarea>
+        <div class="field-error" id="err-plans"></div>
+      </div>
+      <div class="form-group">
+        <label>Special Requests <span style="font-weight:400; color:var(--muted)">(optional)</span></label>
+        <textarea class="form-control" style="min-height:70px" id="fSpecial" placeholder="Any allergies, preferences, or additional notes for the admin team…"></textarea>
+      </div>
+
+      <div class="panel-actions">
+        <button class="btn-back" onclick="goToStep(2)">← Back</button>
+        <button class="btn-next" id="btn-next3" onclick="goToStep(4)">Next: Review Request →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 4: Review ── -->
+    <div class="panel" id="panel4">
+      <div class="panel__title">Review Your Request</div>
+      <div class="panel__sub">Double-check your details before submitting. Our team will review and confirm your booking.</div>
+
+      <div class="review-box">
+        <div class="review-box__title">Booking Summary</div>
+        <div class="review-row"><span class="review-row__key">Service</span><span class="review-row__val" id="rv-service">—</span></div>
+        <div class="review-row"><span class="review-row__key">Duration</span><span class="review-row__val" id="rv-duration">—</span></div>
+        <div class="review-row"><span class="review-row__key">Date</span><span class="review-row__val" id="rv-date">—</span></div>
+        <div class="review-row"><span class="review-row__key">Start Time</span><span class="review-row__val" id="rv-start">—</span></div>
+        <div class="review-row"><span class="review-row__key">End Time</span><span class="review-row__val" id="rv-end">—</span></div>
+        <div class="review-row"><span class="review-row__key">Meeting Point</span><span class="review-row__val" id="rv-meeting">—</span></div>
+      </div>
+
+      <div class="review-box">
+        <div class="review-box__title">Contact Information</div>
+        <div class="review-row"><span class="review-row__key">Name</span><span class="review-row__val" id="rv-name">—</span></div>
+        <div class="review-row"><span class="review-row__key">Email</span><span class="review-row__val" id="rv-email">—</span></div>
+        <div class="review-row"><span class="review-row__key">WhatsApp</span><span class="review-row__val" id="rv-phone">—</span></div>
+        <div class="review-row"><span class="review-row__key">Plans / Notes</span><span class="review-row__val" id="rv-plans" style="font-weight:400; font-size:13px;">—</span></div>
+      </div>
+
+      <div class="review-note">
+        <span>ℹ️</span>
+        <div>
+          <strong>No payment required now.</strong> Our admin team will review your request and reach out via WhatsApp within 2 hours to confirm your assigned Buddy and provide payment instructions.
+        </div>
+      </div>
+
+      <div class="panel-error" id="err-submit"></div>
+      <div class="panel-actions">
+        <button class="btn-back" onclick="goToStep(3)">← Back</button>
+        <button class="btn-submit" id="btn-submit" onclick="submitBooking()">✓ Submit Booking Request</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     THANK YOU
+═══════════════════════════════════════════ -->
+<section id="thankyou" class="section--sm">
+  <div class="container">
+    <div class="ty-wrap">
+      <div class="ty-icon">🎉</div>
+      <div class="ty-heading">Request Received!</div>
+      <p class="ty-sub">Thank you for booking with Bangkok Buddy. Your request has been submitted and a confirmation email is on its way to your inbox.</p>
+
+      <div class="ty-ref" id="ty-ref-num">Ref: BB-000000</div>
+
+      <div class="ty-card">
+        <div class="ty-card__title">What Happens Next</div>
+        <ul class="ty-steps">
+          <li data-n="1">Our admin team reviews your request and hand-picks the best buddy for you.</li>
+          <li data-n="2">You'll receive a WhatsApp message within 2 hours with your assigned Buddy's profile.</li>
+          <li data-n="3">Payment instructions will be shared via WhatsApp or email — no upfront payment required now.</li>
+          <li data-n="4">Your buddy will meet you at the confirmed location at the agreed time. Enjoy Bangkok! 🙏</li>
+        </ul>
+      </div>
+
+      <button class="btn btn--primary" onclick="resetForm()">← Submit Another Request</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════ -->
+<footer class="footer" id="contact">
+  <div class="container">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__logo">
+          <div class="footer__logo-mark">B</div>
+          Bangkok Buddy
+        </div>
+        <p class="footer__desc">Your trusted local companion service in Bangkok. Connecting travelers and expats with verified, friendly local guides since 2023.</p>
+        <div class="footer__social">
+          <button class="footer__social-btn">💬</button>
+          <button class="footer__social-btn">📸</button>
+          <button class="footer__social-btn">🐦</button>
+        </div>
+      </div>
+      <div>
+        <div class="footer__col-title">Services</div>
+        <ul class="footer__links">
+          <li><a href="#">Urban Navigator</a></li>
+          <li><a href="#">Local Translator</a></li>
+          <li><a href="#">Shopping Buddy</a></li>
+          <li><a href="#">Photo Buddy</a></li>
+          <li><a href="#">Nightlife Buddy</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Company</div>
+        <ul class="footer__links">
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">How It Works</a></li>
+          <li><a href="#">Become a Buddy</a></li>
+          <li><a href="#">Safety Policy</a></li>
+          <li><a href="#">FAQs</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Contact</div>
+        <ul class="footer__links">
+          <li><a href="#">📧 hello@bangkokbuddy.co</a></li>
+          <li><a href="#">💬 WhatsApp Us</a></li>
+          <li><a href="#">📍 Bangkok, Thailand</a></li>
+          <li><a href="#">⏰ Daily 8AM – 11PM</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2024 Bangkok Buddy. All rights reserved.</span>
+      <span>Privacy Policy · Terms of Service · Cookie Policy</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
+<script>
+  /* ═══════════════════════════════════════════════════════════
+     CONFIGURATION — fill in your keys before going live
+     ═══════════════════════════════════════════════════════════
+     EmailJS  → https://www.emailjs.com
+       1. Sign up → Email Services → connect Gmail / Outlook
+       2. Email Templates → create a template (see variables below)
+       3. Account → API Keys → copy your Public Key
+
+     Abstract API → https://app.abstractapi.com/api/email-validation
+       1. Sign up (free) → copy your API key
+  ═══════════════════════════════════════════════════════════ */
+  const EMAILJS_PUBLIC_KEY  = 'YOUR_EMAILJS_PUBLIC_KEY';
+  const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
+  const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+  const ADMIN_EMAIL         = 'hello@bangkokbuddy.co'; // receives booking notifications
+  const ABSTRACT_API_KEY    = 'YOUR_ABSTRACT_API_KEY';
+
+  /* EmailJS init (safe to call even with placeholder key) */
+  try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch(e) {}
+
+  /* ── State ── */
+  const state = {
+    service: '', duration: 0,
+    date: null, time: '',
+    name: '', email: '', phone: '',
+    meeting: '', plans: '', special: '',
+    emailValid: false
+  };
+
+  /* ═══════════════════════════════════════════
+     VALIDATION HELPERS
+  ═══════════════════════════════════════════ */
+  function showFieldError(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = '⚠ ' + msg;
+    el.classList.add('visible');
+  }
+  function clearFieldError(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  }
+  function setFieldState(inputId, ok) {
+    const el = document.getElementById(inputId);
+    if (!el) return;
+    el.classList.toggle('error', !ok);
+    el.classList.toggle('ok',    ok);
+  }
+  function showPanelError(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = '⚠ ' + msg;
+    el.classList.add('visible');
+  }
+  function clearPanelError(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  }
+  function shake(selector) {
+    document.querySelectorAll(selector).forEach(el => {
+      el.classList.remove('shake');
+      void el.offsetWidth; // reflow
+      el.classList.add('shake');
+      el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+    });
+  }
+
+  /* ═══════════════════════════════════════════
+     EMAIL VALIDATION (Abstract API + format)
+  ═══════════════════════════════════════════ */
+  function emailStatusShow(cls, msg) {
+    const el = document.getElementById('email-status');
+    if (!el) return;
+    el.className = 'email-status visible ' + cls;
+    el.textContent = msg;
+  }
+  function emailStatusHide() {
+    const el = document.getElementById('email-status');
+    if (el) el.className = 'email-status';
+  }
+
+  async function validateEmailAsync(email) {
+    // 1. Basic format check
+    const fmt = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+    if (!fmt) {
+      setFieldState('fEmail', false);
+      showFieldError('err-email', 'Please enter a valid email address.');
+      emailStatusShow('invalid', '✕ Invalid email format');
+      state.emailValid = false;
+      return false;
+    }
+
+    // 2. If no Abstract API key set — accept on format alone
+    if (!ABSTRACT_API_KEY || ABSTRACT_API_KEY === 'YOUR_ABSTRACT_API_KEY') {
+      clearFieldError('err-email');
+      setFieldState('fEmail', true);
+      emailStatusShow('valid', '✓ Email format looks good');
+      state.emailValid = true;
+      return true;
+    }
+
+    // 3. Abstract API MX / deliverability check
+    emailStatusShow('checking', '⟳ Verifying email…');
+    clearFieldError('err-email');
+    setFieldState('fEmail', false);
+
+    try {
+      const res  = await fetch(`https://emailvalidation.abstractapi.com/v1/?api_key=${ABSTRACT_API_KEY}&email=${encodeURIComponent(email)}`);
+      const data = await res.json();
+
+      if (data.deliverability === 'UNDELIVERABLE') {
+        setFieldState('fEmail', false);
+        showFieldError('err-email', 'This email appears undeliverable. Please use a real email address.');
+        emailStatusShow('invalid', '✕ Email cannot receive messages');
+        state.emailValid = false;
+        return false;
+      }
+      if (data.is_mx_found && data.is_mx_found.value === false) {
+        setFieldState('fEmail', false);
+        showFieldError('err-email', 'Email domain has no mail server — please check and try again.');
+        emailStatusShow('invalid', '✕ Domain has no mail server');
+        state.emailValid = false;
+        return false;
+      }
+      // Valid
+      clearFieldError('err-email');
+      setFieldState('fEmail', true);
+      emailStatusShow('valid', '✓ Email address verified');
+      state.emailValid = true;
+      return true;
+
+    } catch (_) {
+      // API unreachable — fall back to format-only acceptance
+      clearFieldError('err-email');
+      setFieldState('fEmail', true);
+      emailStatusShow('valid', '✓ Email format valid');
+      state.emailValid = true;
+      return true;
+    }
+  }
+
+  /* ═══════════════════════════════════════════
+     CALENDAR
+  ═══════════════════════════════════════════ */
+  let calYear, calMonth;
+  const now = new Date();
+  calYear  = now.getFullYear();
+  calMonth = now.getMonth();
+
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS   = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+
+  function renderCalendar() {
+    document.getElementById('calMonth').textContent = MONTHS[calMonth] + ' ' + calYear;
+    const g = document.getElementById('calGrid');
+    g.innerHTML = '';
+    DAYS.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'cal-day-name'; el.textContent = d;
+      g.appendChild(el);
+    });
+    const first = new Date(calYear, calMonth, 1).getDay();
+    const days  = new Date(calYear, calMonth + 1, 0).getDate();
+    for (let i = 0; i < first; i++) {
+      const el = document.createElement('div');
+      el.className = 'cal-day empty';
+      g.appendChild(el);
+    }
+    for (let d = 1; d <= days; d++) {
+      const el = document.createElement('div');
+      el.className = 'cal-day';
+      el.textContent = d;
+      const thisDate = new Date(calYear, calMonth, d);
+      const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      if (thisDate < todayMid) { el.classList.add('past'); }
+      else {
+        if (thisDate.getTime() === todayMid.getTime()) el.classList.add('today');
+        if (state.date && state.date.getTime() === thisDate.getTime()) el.classList.add('selected');
+        el.onclick = () => selectDate(thisDate, el);
+      }
+      g.appendChild(el);
+    }
+  }
+
+  function prevMonth() {
+    if (--calMonth < 0) { calMonth = 11; calYear--; }
+    renderCalendar();
+  }
+  function nextMonth() {
+    if (++calMonth > 11) { calMonth = 0; calYear++; }
+    renderCalendar();
+  }
+  function selectDate(date, el) {
+    document.querySelectorAll('.cal-day').forEach(d => d.classList.remove('selected'));
+    el.classList.add('selected');
+    state.date = date;
+    state.time = '';
+    clearPanelError('err-step2');
+    renderTimeSlots();
+  }
+
+  /* ═══════════════════════════════════════════
+     TIME SLOTS
+  ═══════════════════════════════════════════ */
+  const SLOTS = ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
+
+  function renderTimeSlots() {
+    const g = document.getElementById('timeGrid');
+    g.innerHTML = '';
+    SLOTS.forEach(t => {
+      const el = document.createElement('div');
+      el.className = 'time-slot';
+      el.textContent = t;
+      if (state.time === t) el.classList.add('selected');
+      el.onclick = () => {
+        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+        el.classList.add('selected');
+        state.time = t;
+        clearPanelError('err-step2');
+        updateEndTime();
+      };
+      g.appendChild(el);
+    });
+  }
+
+  function updateEndTime() {
+    const box = document.getElementById('endTimeBox');
+    const val = document.getElementById('endTimeVal');
+    if (state.time && state.duration) {
+      const [h, m] = state.time.split(':').map(Number);
+      const end = new Date(2000, 0, 1, h + state.duration, m);
+      val.textContent = end.getHours().toString().padStart(2,'0') + ':' + end.getMinutes().toString().padStart(2,'0');
+      box.classList.add('visible');
+    } else {
+      box.classList.remove('visible');
+    }
+  }
+
+  /* ═══════════════════════════════════════════
+     SERVICE & DURATION SELECTION
+  ═══════════════════════════════════════════ */
+  function selectService(card, name) {
+    document.querySelectorAll('.opt-card').forEach(c => {
+      c.classList.remove('selected');
+      c.querySelector('input').checked = false;
+    });
+    card.classList.add('selected');
+    card.querySelector('input').checked = true;
+    state.service = name;
+    clearPanelError('err-step1');
+  }
+
+  function selectDuration(card, hrs) {
+    document.querySelectorAll('.dur-option').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.duration = hrs;
+    clearPanelError('err-step1');
+    updateEndTime();
+  }
+
+  /* ═══════════════════════════════════════════
+     STEPPER
+  ═══════════════════════════════════════════ */
+  let currentStep = 1;
+
+  function updateStepper(to) {
+    for (let i = 1; i <= 4; i++) {
+      const c = document.getElementById('sc' + i);
+      const l = document.getElementById('sl' + i);
+      if (i < to)        { c.className = 'step-circle done'; c.textContent = '✓'; l.className = 'step-label done'; }
+      else if (i === to) { c.className = 'step-circle active'; c.textContent = i;  l.className = 'step-label active'; }
+      else               { c.className = 'step-circle'; c.textContent = i;          l.className = 'step-label'; }
+      if (i < 4) document.getElementById('conn' + i).className = 'step-connector' + (i < to ? ' done' : '');
+    }
+  }
+
+  /* ── goToStep (async for email MX check on step 3→4) ── */
+  async function goToStep(step) {
+
+    /* ── Step 1 validation ── */
+    if (step === 2) {
+      const noSvc = !state.service;
+      const noDur = !state.duration;
+      if (noSvc || noDur) {
+        const msg = noSvc && noDur
+          ? 'Please select a service type and a session duration.'
+          : noSvc ? 'Please select a service type.' : 'Please select a session duration.';
+        showPanelError('err-step1', msg);
+        if (noSvc) shake('.opt-card');
+        if (noDur) shake('.dur-option');
+        return;
+      }
+    }
+
+    /* ── Step 2 validation ── */
+    if (step === 3) {
+      if (!state.date || !state.time) {
+        const msg = !state.date && !state.time
+          ? 'Please select a date and a start time.'
+          : !state.date ? 'Please select a date.' : 'Please select a start time.';
+        showPanelError('err-step2', msg);
+        return;
+      }
+    }
+
+    /* ── Step 3 validation (async email check) ── */
+    if (step === 4) {
+      const btn = document.getElementById('btn-next3');
+      btn.disabled = true;
+      btn.textContent = '⟳ Checking…';
+
+      const n  = document.getElementById('fName').value.trim();
+      const e  = document.getElementById('fEmail').value.trim();
+      const p  = document.getElementById('fPhone').value.trim();
+      const mt = document.getElementById('fMeeting').value.trim();
+      const pl = document.getElementById('fPlans').value.trim();
+
+      let ok = true;
+
+      if (!n)  { showFieldError('err-name',    'Please enter your full name.');        setFieldState('fName',    false); ok = false; }
+      else     { clearFieldError('err-name');                                           setFieldState('fName',    true); }
+
+      if (!p)  { showFieldError('err-phone',   'Please enter your WhatsApp number.');  setFieldState('fPhone',   false); ok = false; }
+      else     { clearFieldError('err-phone');                                          setFieldState('fPhone',   true); }
+
+      if (!mt) { showFieldError('err-meeting', 'Please enter a meeting point.');        setFieldState('fMeeting', false); ok = false; }
+      else     { clearFieldError('err-meeting');                                         setFieldState('fMeeting', true); }
+
+      if (!pl) { showFieldError('err-plans',   'Please describe your plans.');          setFieldState('fPlans',   false); ok = false; }
+      else     { clearFieldError('err-plans');                                           setFieldState('fPlans',   true); }
+
+      if (!e) {
+        showFieldError('err-email', 'Please enter your email address.');
+        setFieldState('fEmail', false);
+        emailStatusHide();
+        ok = false;
+      } else {
+        const emailOk = await validateEmailAsync(e);
+        if (!emailOk) ok = false;
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Next: Review Request →';
+
+      if (!ok) return;
+
+      state.name    = n;  state.email   = e;
+      state.phone   = p;  state.meeting = mt;
+      state.plans   = pl; state.special = document.getElementById('fSpecial').value.trim();
+      populateReview();
+    }
+
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel' + step).classList.add('active');
+    updateStepper(step);
+    currentStep = step;
+    document.getElementById('book').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function populateReview() {
+    const durLabel = { 2: '2 Hours', 4: '4 Hours (Half-day)', 8: '8 Hours (Full-day)' };
+    const [h, m]  = state.time.split(':').map(Number);
+    const end     = new Date(2000, 0, 1, h + state.duration, m);
+    const endStr  = end.getHours().toString().padStart(2,'0') + ':' + end.getMinutes().toString().padStart(2,'0');
+    const dateStr = state.date.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+    document.getElementById('rv-service').textContent  = state.service;
+    document.getElementById('rv-duration').textContent = durLabel[state.duration];
+    document.getElementById('rv-date').textContent     = dateStr;
+    document.getElementById('rv-start').textContent    = state.time;
+    document.getElementById('rv-end').textContent      = endStr;
+    document.getElementById('rv-meeting').textContent  = state.meeting;
+    document.getElementById('rv-name').textContent     = state.name;
+    document.getElementById('rv-email').textContent    = state.email;
+    document.getElementById('rv-phone').textContent    = state.phone;
+    document.getElementById('rv-plans').textContent    = state.plans;
+  }
+
+  /* ═══════════════════════════════════════════
+     SUBMIT + EMAILJS
+     ───────────────────────────────────────────
+     EmailJS template variables used:
+       {{reference}}      {{service}}       {{duration}}
+       {{date}}           {{start_time}}    {{end_time}}
+       {{meeting_point}}  {{plans}}         {{special}}
+       {{customer_name}}  {{customer_email}} {{customer_phone}}
+       {{to_email}}       {{reply_to}}
+  ═══════════════════════════════════════════ */
+  async function submitBooking() {
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.textContent = '⟳ Sending…';
+    clearPanelError('err-submit');
+
+    const ref      = 'BB-' + Date.now().toString().slice(-6);
+    const durLabel = { 2: '2 Hours', 4: '4 Hours (Half-day)', 8: '8 Hours (Full-day)' };
+    const [h, m]   = state.time.split(':').map(Number);
+    const end      = new Date(2000, 0, 1, h + state.duration, m);
+    const endStr   = end.getHours().toString().padStart(2,'0') + ':' + end.getMinutes().toString().padStart(2,'0');
+    const dateStr  = state.date.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+    const templateParams = {
+      to_email:       ADMIN_EMAIL,
+      reply_to:       state.email,
+      reference:      ref,
+      service:        state.service,
+      duration:       durLabel[state.duration],
+      date:           dateStr,
+      start_time:     state.time,
+      end_time:       endStr,
+      meeting_point:  state.meeting,
+      plans:          state.plans,
+      special:        state.special || '—',
+      customer_name:  state.name,
+      customer_email: state.email,
+      customer_phone: state.phone,
+    };
+
+    try {
+      // Only call EmailJS if real keys are configured
+      if (EMAILJS_SERVICE_ID !== 'YOUR_SERVICE_ID') {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+      }
+      // Show thank-you screen
+      document.getElementById('ty-ref-num').textContent = 'Ref: ' + ref;
+      document.getElementById('book').style.display = 'none';
+      document.getElementById('thankyou').classList.add('visible');
+      document.getElementById('thankyou').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    } catch (err) {
+      console.error('EmailJS error:', err);
+      btn.disabled = false;
+      btn.textContent = '✓ Submit Booking Request';
+      showPanelError('err-submit', 'Failed to send your request. Please try again or contact us via WhatsApp.');
+    }
+  }
+
+  /* ═══════════════════════════════════════════
+     RESET FORM
+  ═══════════════════════════════════════════ */
+  function resetForm() {
+    Object.assign(state, { service:'', duration:0, date:null, time:'', name:'', email:'', phone:'', meeting:'', plans:'', special:'', emailValid:false });
+    document.querySelectorAll('.opt-card').forEach(c => { c.classList.remove('selected'); c.querySelector('input').checked = false; });
+    document.querySelectorAll('.dur-option').forEach(c => c.classList.remove('selected'));
+    ['fName','fEmail','fPhone','fMeeting','fPlans','fSpecial'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.value = ''; el.classList.remove('error','ok'); }
+    });
+    ['err-name','err-email','err-phone','err-meeting','err-plans'].forEach(clearFieldError);
+    ['err-step1','err-step2','err-submit'].forEach(clearPanelError);
+    emailStatusHide();
+    document.getElementById('book').style.display = '';
+    document.getElementById('thankyou').classList.remove('visible');
+    goToStep(1);
+    document.getElementById('book').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /* ═══════════════════════════════════════════
+     HELPERS
+  ═══════════════════════════════════════════ */
+  function selectServiceAndBook(name) {
+    scrollToBook();
+    setTimeout(() => {
+      document.querySelectorAll('#panel1 .opt-card').forEach(c => {
+        if (c.querySelector('.opt-card__name').textContent === name) selectService(c, name);
+      });
+    }, 600);
+  }
+  function scrollToBook() {
+    document.getElementById('book').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /* ═══════════════════════════════════════════
+     REAL-TIME FIELD LISTENERS
+  ═══════════════════════════════════════════ */
+  document.addEventListener('DOMContentLoaded', () => {
+    // Email: validate on blur, reset on type
+    const emailEl = document.getElementById('fEmail');
+    if (emailEl) {
+      emailEl.addEventListener('blur', () => {
+        if (emailEl.value.trim()) validateEmailAsync(emailEl.value.trim());
+      });
+      emailEl.addEventListener('input', () => {
+        state.emailValid = false;
+        clearFieldError('err-email');
+        emailEl.classList.remove('error','ok');
+        emailStatusHide();
+      });
+    }
+    // Other fields: clear error as soon as user types something
+    [['fName','err-name'],['fPhone','err-phone'],['fMeeting','err-meeting'],['fPlans','err-plans']].forEach(([fid, eid]) => {
+      const el = document.getElementById(fid);
+      if (el) el.addEventListener('input', () => {
+        if (el.value.trim()) { clearFieldError(eid); el.classList.remove('error'); }
+      });
+    });
+  });
+
+  /* ── Init ── */
+  renderCalendar();
+  renderTimeSlots();
+</script>
+</body>
+</html>
